@@ -9,6 +9,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private final static Color BACKGROUND_COLOR = Color.PINK;
     private final static Color PAINT_COLOR = Color.WHITE;
     private final static int TIMER_DELAY = 5;
+    boolean gameInitialised = false;
+
+    Player player;
 
     public GamePanel() {
         setBackground(BACKGROUND_COLOR);
@@ -16,7 +19,20 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         timer.start();
     }
 
-    public void update() {
+    public void createObjects() {
+        player = new Player(getWidth(), getHeight());
+    }
+
+    private void update() {
+        if (!gameInitialised) {
+            createObjects();
+            gameInitialised = true;
+        }
+    }
+
+    private void paintSprite(Graphics g, Sprite sprite) {
+        g.setColor(sprite.getColour());
+        g.fillRect(sprite.getxPosition(), sprite.getyPosition(), sprite.getWidth(), sprite.getHeight());
     }
 
     @Override
@@ -24,6 +40,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         super.paintComponent(g);
         g.setColor(PAINT_COLOR);
         g.fillRect(20, 20, 100, 100);
+        if (gameInitialised) {
+            paintSprite(g, player);
+        }
     }
 
     @Override
