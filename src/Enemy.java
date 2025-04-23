@@ -12,7 +12,7 @@ public class Enemy extends Sprite {
         setWidth(WIDTH);
         setHeight(HEIGHT);
         setColour(COLOUR);
-        setInitialPosition(panelWidth / 2 - (getWidth() / 2), panelHeight / 2 - (getHeight() / 2));
+        setInitialPosition(panelWidth / 5 - (getWidth() / 5), panelHeight / 5 - (getHeight() / 4));
         resetToInitialPosition();
     }
 

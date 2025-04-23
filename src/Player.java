@@ -7,7 +7,7 @@ public class Player extends Sprite {
 
     private static final int WIDTH = 25;
     private static final int HEIGHT = 25;
-    private static final Color COLOUR = Color.GREEN;
+    private static final Color COLOUR = Color.BLACK;
 
     public Player(int panelWidth, int panelHeight) {
         setWidth(WIDTH);

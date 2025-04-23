@@ -1,4 +1,4 @@
-public enum State {
+public enum GameState {
     INITIALISING,
     PLAYING,
     GAME_WON,
