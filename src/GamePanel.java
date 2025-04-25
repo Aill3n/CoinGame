@@ -3,17 +3,23 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.*;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private final static Color BACKGROUND_COLOR = Color.PINK;
-    private final static Color PAINT_COLOR = Color.WHITE;
+    private final static Color PAINT_COLOR = Color.BLACK;
     private final static int TIMER_DELAY = 5;
     private final static int ENEMY_MOVEMENT_SPEED = 2;
+    private static final int NUM_ITEMS = 10;
+    private static final int WALL_WIDTH = 40;
+    private static final int WALL_HEIGHT = 50;
     private GameState gameState;
+    private final List<Enemy> enemies = new ArrayList<>();
+    private final List<Coin> coins = new ArrayList<>();
 
     Player player;
-    Enemy enemy;
     Coin coin;
 
     public GamePanel() {
@@ -27,8 +33,28 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     public void createObjects() {
         player = new Player(getWidth(), getHeight());
-        enemy = new Enemy(getWidth(), getHeight());
-        coin = new Coin(getWidth(), getHeight());
+
+        coins.clear();
+        enemies.clear();
+
+        createCoins();
+        setCoinVelocity();
+
+        createEnemies();
+        setEnemyVelocity();
+
+    }
+
+    private void createEnemies() {
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            enemies.add(EnemyFactory.createEnemy(getWidth(), getHeight(), WALL_WIDTH, WALL_HEIGHT));
+        }
+    }
+
+    private void createCoins() {
+        for (int i = 0; i < NUM_ITEMS; i++) {
+            coins.add(CoinFactoy.createCoin(getWidth(), getHeight(), WALL_WIDTH - 10, WALL_HEIGHT - 10));
+        }
     }
 
     private void update() {
@@ -41,8 +67,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
             case PLAYING -> {
                 moveObject(player);
-                moveObject(enemy);
-                checkWallColision(enemy);
+                for (Enemy enemy : enemies) {
+                    moveObject(enemy);
+                    checkWallColision(enemy);
+                }
+                for (Coin currentCoin : coins) {
+                    moveObject(currentCoin);
+                    checkWallColision(currentCoin);
+                }
                 break;
             }
             case GAME_OVER -> {
@@ -58,28 +90,48 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     private void paintSprite(Graphics g, Sprite sprite) {
         g.setColor(sprite.getColour());
-        g.fillRect(sprite.getxPosition(), sprite.getyPosition(), sprite.getWidth(), sprite.getHeight());
+        g.fill3DRect(sprite.getxPosition(), sprite.getyPosition(), sprite.getWidth(), sprite.getHeight(), true);
+    }
+
+    private void paintCoin(Graphics g, Sprite sprite) {
+        g.setColor(sprite.getColour());
+        g.fillOval(sprite.getxPosition(), sprite.getyPosition(), sprite.getWidth(), sprite.getHeight());
     }
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.setColor(PAINT_COLOR); // AILLEn
+        g.setColor(PAINT_COLOR);
+
+        int borderWidth = 40;
+        int borderHeight = 50;
+        int panelWidth = getWidth();
+        int panelHeight = getHeight();
+        int rectWidth = panelWidth - 2 * borderWidth;
+        int rectHeight = panelHeight - 2 * borderHeight;
 
         switch (gameState) {
-            case INITIALISING -> g.drawString("Press ENTER or SPACE to start the game.", 50, 50);
-            case PLAYING -> g.drawString("Game is in progress", 50, 50);
-            case GAME_OVER -> g.drawString("Game Over! Press ENTER or SPACE to restart.", 50, 50);
-            case GAME_WON -> g.drawString("You won! Press ENTER or SPACE to play again.", 50, 50);
+            case INITIALISING ->
+                g.drawString("Press ENTER or SPACE to start the game.", borderWidth, borderHeight - 20);
+            case PLAYING -> g.drawString("Game is in progress", borderWidth, borderHeight - 20);
+            case GAME_OVER ->
+                g.drawString("Game Over! Press ENTER or SPACE to restart.", borderWidth, borderHeight - 20);
+            case GAME_WON ->
+                g.drawString("You won! Press ENTER or SPACE to play again.", borderWidth, borderHeight - 20);
             default -> {
             }
         }
 
-        g.fillRect(40, 90, 700, 400);
+        g.fillRect(borderWidth, borderHeight, rectWidth, rectHeight);
+
         if (gameState != GameState.INITIALISING) {
             paintSprite(g, player);
-            paintSprite(g, enemy);
-            paintSprite(g, coin);
+            for (Coin coin : coins) {
+                paintCoin(g, coin);
+            }
+            for (Enemy enemy : enemies) {
+                paintSprite(g, enemy);
+            }
         }
     }
 
@@ -107,7 +159,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 || gameState == GameState.GAME_WON) {
             if (event.getKeyCode() == KeyEvent.VK_ENTER || event.getKeyCode() == KeyEvent.VK_SPACE) {
                 createObjects();
-                setEnemyVelocity();
                 gameState = GameState.PLAYING;
             } else if (event.getKeyCode() == KeyEvent.VK_ESCAPE) {
                 System.exit(0);
@@ -131,19 +182,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         obj.setyPosition(obj.getyPosition() + obj.getyVelocity(), getHeight());
     }
 
-    private void checkWallColision(Enemy enemy) {
-        if (enemy.getxPosition() <= 0) {
-            // Hit left side of screen
-            enemy.setxVelocity(-enemy.getxVelocity());
-            resetEnemy();
-        } else if (enemy.getxPosition() >= getWidth() - enemy.getWidth()) {
-            // Hit right side of screen
-            enemy.setxVelocity(-enemy.getxVelocity());
-            resetEnemy();
+    private void checkWallColision(Sprite object) {
+
+        // Hit left side of screen or right side of screen
+        if (object.getxPosition() <= WALL_WIDTH
+                || object.getxPosition() >= getWidth() - object.getWidth() - WALL_WIDTH) {
+            object.setxVelocity(-object.getxVelocity());
         }
-        if (enemy.getyPosition() <= 0 || enemy.getyPosition() >= getHeight() - enemy.getHeight()) {
-            // Hit top or bottom of screen
-            enemy.setyVelocity(-enemy.getyVelocity());
+        // Hit top or bottom of screen
+        if (object.getyPosition() <= WALL_HEIGHT
+                || object.getyPosition() >= getHeight() - object.getHeight() - WALL_HEIGHT) {
+            object.setyVelocity(-object.getyVelocity());
         }
     }
 
@@ -158,11 +207,22 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
 
     private void setEnemyVelocity() {
-        enemy.setxVelocity(ENEMY_MOVEMENT_SPEED);
-        enemy.setyVelocity(ENEMY_MOVEMENT_SPEED);
+        for (Enemy enemy : enemies) {
+            enemy.setxVelocity(ENEMY_MOVEMENT_SPEED);
+            enemy.setyVelocity(ENEMY_MOVEMENT_SPEED);
+        }
+    }
+
+    private void setCoinVelocity() {
+        for (Coin coin : coins) {
+            coin.setxVelocity(ENEMY_MOVEMENT_SPEED);
+            coin.setyVelocity(ENEMY_MOVEMENT_SPEED);
+        }
     }
 
     private void resetEnemy() {
-        enemy.resetToInitialPosition();
+        for (Enemy enemy : enemies) {
+            enemy.resetToInitialPosition();
+        }
     }
 }
