@@ -1,3 +1,4 @@
+package game;
 public class EnemyFactory {
 
     public static Enemy createEnemy(int panelWidth, int panelHeight, int borderWidth, int borderHeight) {

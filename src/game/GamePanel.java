@@ -1,3 +1,5 @@
+package game;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,7 +22,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private final List<Coin> coins = new ArrayList<>();
 
     Player player;
-    Coin coin;
 
     public GamePanel() {
         setBackground(BACKGROUND_COLOR);
@@ -67,14 +68,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
             case PLAYING -> {
                 moveObject(player);
-                for (Enemy enemy : enemies) {
-                    moveObject(enemy);
-                    checkWallColision(enemy);
-                }
-                for (Coin currentCoin : coins) {
-                    moveObject(currentCoin);
-                    checkWallColision(currentCoin);
-                }
+                checkWallColision(player);
+                moveEnemy();
+                moveCoins();
                 break;
             }
             case GAME_OVER -> {
@@ -85,6 +81,20 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 winGame();
                 break;
             }
+        }
+    }
+
+    private void moveCoins() {
+        for (Coin currentCoin : coins) {
+            moveObject(currentCoin);
+            checkWallColision(currentCoin);
+        }
+    }
+
+    private void moveEnemy() {
+        for (Enemy enemy : enemies) {
+            moveObject(enemy);
+            checkWallColision(enemy);
         }
     }
 
@@ -113,7 +123,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         switch (gameState) {
             case INITIALISING ->
                 g.drawString("Press ENTER or SPACE to start the game.", borderWidth, borderHeight - 20);
-            case PLAYING -> g.drawString("Game is in progress", borderWidth, borderHeight - 20);
+            case PLAYING -> {
+                g.setFont(new Font("Roboto", Font.PLAIN, 18)); // Set font to Consolas with size 18
+                g.drawString("Health:" + displayHearts(), borderWidth, borderHeight - 20);
+                g.drawString("\tPoints:" + displayCoins(), borderWidth + 100, borderHeight - 20);
+            }
             case GAME_OVER ->
                 g.drawString("Game Over! Press ENTER or SPACE to restart.", borderWidth, borderHeight - 20);
             case GAME_WON ->
@@ -126,13 +140,29 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         if (gameState != GameState.INITIALISING) {
             paintSprite(g, player);
-            for (Coin coin : coins) {
-                paintCoin(g, coin);
+            for (Coin currentCoin : coins) {
+                paintCoin(g, currentCoin);
             }
             for (Enemy enemy : enemies) {
                 paintSprite(g, enemy);
             }
         }
+    }
+
+    private String displayHearts() {
+        String hearts = "\u2661";
+        // for (int i = 0; i < player.getHealth(); i++) {
+        // hearts += "\\u2661";
+        // }
+        return hearts;
+    }
+
+    private int displayCoins() {
+        int coinsQuantity = 0;
+        // for (int i = 0; i < player.getCoins(); i++) {
+        // coinsQuantity += "\\u2661";
+        // }
+        return coinsQuantity;
     }
 
     @Override
@@ -154,6 +184,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 case KeyEvent.VK_DOWN -> player.setyVelocity(5); // Move down
                 case KeyEvent.VK_LEFT -> player.setxVelocity(-5); // Move left
                 case KeyEvent.VK_RIGHT -> player.setxVelocity(5); // Move right
+                case KeyEvent.VK_ESCAPE -> {
+                    gameState = GameState.INITIALISING;
+                    resetEnemies();
+                    player.resetToInitialPosition();
+                }
             }
         } else if (gameState == GameState.INITIALISING || gameState == GameState.GAME_OVER
                 || gameState == GameState.GAME_WON) {
@@ -196,6 +231,20 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
     }
 
+    private void checkWallColisionPlayer(Sprite object) {
+
+        // Hit left side of screen or right side of screen
+        if (object.getxPosition() <= WALL_WIDTH
+                || object.getxPosition() >= getWidth() - object.getWidth() - WALL_WIDTH) {
+            object.setxVelocity(10);
+        }
+        // Hit top or bottom of screen
+        if (object.getyPosition() <= WALL_HEIGHT
+                || object.getyPosition() >= getHeight() - object.getHeight() - WALL_HEIGHT) {
+            object.setyVelocity(10);
+        }
+    }
+
     private void winGame() {
         System.out.println("You won. Congratulations!");
         gameState = GameState.GAME_OVER;
@@ -220,7 +269,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
     }
 
-    private void resetEnemy() {
+    private void resetEnemies() {
         for (Enemy enemy : enemies) {
             enemy.resetToInitialPosition();
         }

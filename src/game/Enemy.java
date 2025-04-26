@@ -1,3 +1,4 @@
+package game;
 import java.awt.Color;
 
 // The Enemy class will represent antagonists that hurt the player.

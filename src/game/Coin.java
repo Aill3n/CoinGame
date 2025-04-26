@@ -1,3 +1,5 @@
+package game;
+
 import java.awt.Color;
 
 // The Coin will represent non-moving objects the player can collect.
