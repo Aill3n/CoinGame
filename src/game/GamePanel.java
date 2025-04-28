@@ -1,3 +1,9 @@
+/* 
+BIT504 A3
+Aillen Teixeira 
+Student ID: 2021712
+*/
+
 package game;
 
 import java.awt.*;
@@ -10,6 +16,8 @@ import java.util.List;
 import javax.swing.*;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
+    private static final int INVINCIBILITY_DUR = 3000;
+    private static final int PADDING = 10;
     private final static Color BACKGROUND_COLOR = Color.PINK;
     private final static Color PAINT_COLOR = Color.BLACK;
     private final static Color INVINCIBLE_COLOR = Color.MAGENTA;
@@ -19,6 +27,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private static final int WALL_WIDTH = 40;
     private static final int WALL_HEIGHT = 50;
     private static final int POINTS_TO_WIN = 10;
+    private static final int HEARTS = 3;
     private GameState gameState;
     private final List<Enemy> enemies = new ArrayList<>();
     private final List<Coin> coins = new ArrayList<>();
@@ -37,28 +46,36 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
 
     public void createObjects() {
+        createPlayer();
+        setUpCoins();
+        setUpEnemies();
+    }
+
+    private void createPlayer() {
         player = new Player(getWidth(), getHeight());
+    }
 
-        coins.clear();
+    private void setUpEnemies() {
         enemies.clear();
-
-        createCoins();
-        setCoinVelocity();
-
         createEnemies();
-        setEnemyVelocity();
+        setObjectVelocity(enemies);
+    }
 
+    private void setUpCoins() {
+        coins.clear();
+        createCoins();
+        setObjectVelocity(coins);
     }
 
     private void createEnemies() {
         for (int i = 0; i < NUM_ITEMS; i++) {
-            enemies.add(EnemyFactory.createEnemy(getWidth(), getHeight(), WALL_WIDTH + 10, WALL_HEIGHT + 10));
+            enemies.add(EnemyFactory.createEnemy(getWidth(), getHeight(), WALL_WIDTH + PADDING, WALL_HEIGHT + PADDING));
         }
     }
 
     private void createCoins() {
         for (int i = 0; i < NUM_ITEMS; i++) {
-            coins.add(CoinFactoy.createCoin(getWidth(), getHeight(), WALL_WIDTH + 10, WALL_HEIGHT + 10));
+            coins.add(CoinFactoy.createCoin(getWidth(), getHeight(), WALL_WIDTH + PADDING, WALL_HEIGHT + PADDING));
         }
     }
 
@@ -77,13 +94,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 checkCollision();
                 checkWin();
             }
-            case GAME_OVER -> {
+            case GAME_OVER, GAME_WON -> {
                 resetGame();
-                gameState = GameState.GAME_OVER;
-            }
-            case GAME_WON -> {
-                resetGame();
-                gameState = GameState.GAME_WON;
             }
         }
     }
@@ -246,7 +258,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         player.setInvencible(true);
         player.setColour(INVINCIBLE_COLOR);
 
-        Timer invincibleTimer = new Timer(3000, e -> {
+        Timer invincibleTimer = new Timer(INVINCIBILITY_DUR, e -> {
             // Reset the changes after 3 seconds
             player.setColour(Color.WHITE);
             player.setInvencible(false);
@@ -283,17 +295,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
     }
 
-    private void setEnemyVelocity() {
-        for (Enemy enemy : enemies) {
-            enemy.setxVelocity(MOVEMENT_SPEED);
-            enemy.setyVelocity(MOVEMENT_SPEED);
-        }
-    }
-
-    private void setCoinVelocity() {
-        for (Coin coin : coins) {
-            coin.setxVelocity(MOVEMENT_SPEED);
-            coin.setyVelocity(MOVEMENT_SPEED);
+    private void setObjectVelocity(List<? extends Sprite> objects) {
+        for (Sprite obj : objects) {
+            obj.setxVelocity(MOVEMENT_SPEED);
+            obj.setyVelocity(MOVEMENT_SPEED);
         }
     }
 
@@ -309,7 +314,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private void resetGame() {
         resetObjects();
         player.resetToInitialPosition();
-        player.setHealth(3);
+        player.setHealth(HEARTS);
         playerScore = 0;
     }
 

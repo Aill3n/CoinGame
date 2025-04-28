@@ -1,4 +1,5 @@
 package game;
+
 import java.awt.Color;
 
 // The Enemy class will represent antagonists that hurt the player.
@@ -6,7 +7,7 @@ import java.awt.Color;
 public class Enemy extends Sprite {
 
     private static final int DIMENSION = 20;
-    private static final Color COLOUR = Color.RED;
+    private static final Color COLOUR = Color.BLUE;
 
     public Enemy(int positionX, int positionY) {
         setWidth(DIMENSION);

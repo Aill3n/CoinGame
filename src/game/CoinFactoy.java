@@ -1,4 +1,5 @@
 package game;
+
 public class CoinFactoy {
 
     public static Coin createCoin(int panelWidth, int panelHeight, int borderWidth, int borderHeight) {
