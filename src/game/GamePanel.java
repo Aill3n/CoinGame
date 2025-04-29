@@ -16,7 +16,9 @@ import java.util.List;
 import javax.swing.*;
 
 
-//Manages the game panel, display components, movements, and handles logic
+/**
+ * Manages the game panel, display components, movements, and handles logic
+ */
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private static final int INVINCIBILITY_DUR = 3000;
     private static final int PADDING = 10;
@@ -97,22 +99,42 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     private void createEnemies() {
         for (int i = 0; i < NUM_ITEMS; i++) {
-            enemies.add(EnemyFactory.createEnemy(getWidth() - 2 * (WALL_WIDTH + PADDING),
+            Enemy thisEnemy = EnemyFactory.createEnemy(getWidth() - 2 * (WALL_WIDTH + PADDING),
                     getHeight() - 2 * (WALL_HEIGHT + PADDING),
                     WALL_WIDTH + PADDING,
-                    WALL_HEIGHT + PADDING));
+                    WALL_HEIGHT + PADDING);
+            checkObjectCollapsing(thisEnemy, enemies);
+            enemies.add(thisEnemy);
         }
 }
+
+    /**
+     * Check the initial position of existing objects and avoids collapsing.
+     */
+    private void checkObjectCollapsing(Sprite sprite, List<? extends Sprite> listItem) {
+        for (Sprite obj : listItem) {
+            while (isColliding(sprite, obj) || player.isPlayerTooClose(sprite)) {
+
+                int newX = WALL_WIDTH + PADDING + (int) (Math.random() * (getWidth() - 2 * (WALL_WIDTH + PADDING) - sprite.getWidth()));
+                int newY = WALL_HEIGHT + PADDING + (int) (Math.random() * (getHeight() - 2 * (WALL_HEIGHT + PADDING) - sprite.getHeight()));
+
+                sprite.setxPosition(newX);
+                sprite.setyPosition(newY);
+        }
+        }
+    }
 
     /**
      * Creates multiple coins and adds them to the coin list.
      */
     private void createCoins() {
         for (int i = 0; i < NUM_ITEMS; i++) {
-            coins.add(CoinFactory.createCoin(getWidth() - 2 * (WALL_WIDTH + PADDING),
+            Coin thisCoin = CoinFactory.createCoin(getWidth() - 2 * (WALL_WIDTH + PADDING),
                     getHeight() - 2 * (WALL_HEIGHT + PADDING),
                     WALL_WIDTH + PADDING,
-                    WALL_HEIGHT + PADDING));
+                    WALL_HEIGHT + PADDING);
+            checkObjectCollapsing(thisCoin, coins);
+            coins.add(thisCoin);
         }
     }
 
@@ -272,7 +294,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 case KeyEvent.VK_DOWN -> player.setyVelocity(5); // Move down
                 case KeyEvent.VK_LEFT -> player.setxVelocity(-5); // Move left
                 case KeyEvent.VK_RIGHT -> player.setxVelocity(5); // Move right
-                case KeyEvent.VK_ESCAPE -> gameState = GameState.INITIALISING;
+                case KeyEvent.VK_ESCAPE -> {
+                    gameState = GameState.INITIALISING;
+                    resetGame();
+                }
             }
         } else if (gameState == GameState.INITIALISING || gameState == GameState.GAME_OVER
                 || gameState == GameState.GAME_WON) {
@@ -381,18 +406,19 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
 
     /**
-     * Determines whether two sprite objects are colliding by checking
-     * for overlapping positions and dimensions.
+     * Determines whether two sprite objects are colliding or too close to one another
+     * by checking for overlapping positions and a proximity threshold.
      *
      * @param obj1 the first sprite object
      * @param obj2 the second sprite object
-     * @return true if the objects are colliding, false otherwise
+     * @return true if the objects are colliding or too close, false otherwise
      */
     private boolean isColliding(Sprite obj1, Sprite obj2) {
-        return obj1.getxPosition() < obj2.getxPosition() + obj2.getWidth() &&
-                obj1.getxPosition() + obj1.getWidth() > obj2.getxPosition() &&
-                obj1.getyPosition() < obj2.getyPosition() + obj2.getHeight() &&
-                obj1.getyPosition() + obj1.getHeight() > obj2.getyPosition();
+        int distanceBetweenObj = 25;
+        return obj1.getxPosition() < obj2.getxPosition() + obj2.getWidth() + distanceBetweenObj &&
+                obj1.getxPosition() + obj1.getWidth() + distanceBetweenObj > obj2.getxPosition() &&
+                obj1.getyPosition() < obj2.getyPosition() + obj2.getHeight() + distanceBetweenObj &&
+                obj1.getyPosition() + obj1.getHeight() + distanceBetweenObj > obj2.getyPosition();
     }
 
     

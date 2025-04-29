@@ -1,3 +1,9 @@
+/*
+BIT504 A3
+Aillen Teixeira
+Student ID: 2021712
+*/
+
 package game;
 
 import java.awt.Color;
@@ -36,4 +42,12 @@ public class Player extends Sprite {
         this.invincible = invincible;
     }
 
+    /**
+     * Check the position of the player against a coin or an emey
+     */
+    public boolean isPlayerTooClose(Sprite sprite) {
+        int safeDistance = 100;
+        return Math.abs(sprite.getxPosition() - this.getxPosition()) < safeDistance
+                && Math.abs(sprite.getyPosition() - this.getyPosition()) < safeDistance;
+    }
 }
