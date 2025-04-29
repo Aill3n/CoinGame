@@ -33,8 +33,15 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private GameState gameState;
     private final List<Enemy> enemies = new ArrayList<>();
     private final List<Coin> coins = new ArrayList<>();
-
     private int playerScore = 0;
+
+
+    // TODO: Coins shouldn't overlap.
+    // TODO: Enemies shouldn't overlap.
+    /*3. Objects collapsing;
+   - Os objetos so podem ser mensurados depois de criados
+   - Entao toda vez que criar, verifique senao existe um existente com posicao de range de 50 radius
+   - Se houver, delete o objeto e crie novamente*/
 
     Player player;
 
@@ -87,18 +94,25 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     /**
      * Creates multiple enemies and adds them to the enemy list.
      */
+
     private void createEnemies() {
         for (int i = 0; i < NUM_ITEMS; i++) {
-            enemies.add(EnemyFactory.createEnemy(getWidth(), getHeight(), WALL_WIDTH + PADDING, WALL_HEIGHT + PADDING));
+            enemies.add(EnemyFactory.createEnemy(getWidth() - 2 * (WALL_WIDTH + PADDING),
+                    getHeight() - 2 * (WALL_HEIGHT + PADDING),
+                    WALL_WIDTH + PADDING,
+                    WALL_HEIGHT + PADDING));
         }
-    }
+}
 
     /**
      * Creates multiple coins and adds them to the coin list.
      */
     private void createCoins() {
         for (int i = 0; i < NUM_ITEMS; i++) {
-            coins.add(CoinFactory.createCoin(getWidth(), getHeight(), WALL_WIDTH + PADDING, WALL_HEIGHT + PADDING));
+            coins.add(CoinFactory.createCoin(getWidth() - 2 * (WALL_WIDTH + PADDING),
+                    getHeight() - 2 * (WALL_HEIGHT + PADDING),
+                    WALL_WIDTH + PADDING,
+                    WALL_HEIGHT + PADDING));
         }
     }
 
@@ -175,32 +189,34 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.setColor(PAINT_COLOR);
-
-        int borderWidth = 40;
-        int borderHeight = 50;
-        int panelWidth = getWidth();
-        int panelHeight = getHeight();
-        int rectWidth = panelWidth - 2 * borderWidth;
-        int rectHeight = panelHeight - 2 * borderHeight;
-
         g.setFont(new Font("Roboto", Font.PLAIN, 20));
 
+        int borderPaddingWidth = 40;
+        int borderPaddingHeight = 50;
+
+        // Writes text for different stages of the game
+        // Aligns the text slightly above the rectangle
         switch (gameState) {
             case INITIALISING ->
-                g.drawString("Press ENTER or SPACE to start the game.", borderWidth, borderHeight - 20);
+                g.drawString("Press ENTER or SPACE to start the game.", borderPaddingWidth, borderPaddingHeight - PADDING);
             case PLAYING -> {
-                g.drawString("Health:" + displayHearts(), borderWidth, borderHeight - 20);
-                g.drawString("\t Points:" + playerScore, borderWidth + 100, borderHeight - 20);
+                g.drawString("Health:" + displayHearts(), borderPaddingWidth, borderPaddingHeight - PADDING);
+                g.drawString("\t Points:" + playerScore, borderPaddingWidth + 100, borderPaddingHeight - PADDING);
             }
             case GAME_OVER ->
-                g.drawString("Game Over! Press ENTER or SPACE to restart.", borderWidth, borderHeight - 20);
+                g.drawString("Game Over! Press ENTER or SPACE to restart.", borderPaddingWidth, borderPaddingHeight - PADDING);
             case GAME_WON ->
-                g.drawString("You won! Press ENTER or SPACE to play again.", borderWidth, borderHeight - 20);
+                g.drawString("You won! Press ENTER or SPACE to play again.", borderPaddingWidth, borderPaddingHeight - PADDING);
             default -> {
             }
         }
 
-        g.fillRect(borderWidth, borderHeight, rectWidth, rectHeight);
+        // - 2 to consider the border for top and bottom. Width = 720
+        // - 2 to consider the border for right and left. Height = 500
+        int innerWidth = getWidth() - 2 * borderPaddingWidth;
+        int innerHeight = getHeight() - 2 * borderPaddingHeight;
+        g.drawRect(borderPaddingWidth, borderPaddingHeight, innerWidth, innerHeight);
+        g.fillRect(borderPaddingWidth, borderPaddingHeight, innerWidth,innerHeight);
 
         if (gameState == GameState.PLAYING) {
             paintSprite(g, player);
