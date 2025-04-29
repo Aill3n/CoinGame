@@ -11,7 +11,7 @@ public class Main extends JFrame {
 
     public static void main(String[] args) {
 
-        javax.swing.SwingUtilities.invokeLater(() -> new Main());
+        javax.swing.SwingUtilities.invokeLater(Main::new);
     }
 
     public Main() {

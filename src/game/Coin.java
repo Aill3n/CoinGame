@@ -2,7 +2,9 @@ package game;
 
 import java.awt.Color;
 
-// The Coin will represent non-moving objects the player can collect.
+/**
+ * The Coin will represent non-moving objects the player can collect.
+ */
 public class Coin extends Sprite {
 
     private static final int DIMENSION = 20;

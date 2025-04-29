@@ -1,12 +1,18 @@
 package game;
 
+/**
+ * The EnemyFactory class is responsible for creating Enemy objects
+ * with random positions within specified panel bounds.
+ */
 public class EnemyFactory extends Sprite {
+
+    // TODO: Coins shouldn't overlap.
+    // TODO: Enemies shouldn't overlap.
 
     public static Enemy createEnemy(int panelWidth, int panelHeight, int borderWidth, int borderHeight) {
         int rectWidth = panelWidth - 5 * borderWidth;
         int rectHeight = panelHeight - 5 * borderHeight;
 
-        // Enemy dimensions
         int enemySize = 25;
 
         int positionX = borderWidth + (int) (Math.random() * (rectWidth - enemySize));

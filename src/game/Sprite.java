@@ -2,6 +2,10 @@ package game;
 
 import java.awt.*;
 
+/**
+ * The Sprite class represents a graphical object with position, size, velocity,
+ * and color attributes. It is designed to serve as a base class for other objects.
+ */
 public class Sprite {
 
     private Color color;
@@ -18,9 +22,6 @@ public class Sprite {
         this.color = colour;
     }
 
-    public Rectangle getRectangle() {
-        return new Rectangle(getxPosition(), getyPosition(), getWidth(), getHeight());
-    }
 
     public int getxPosition() {
         return xPosition;
@@ -86,22 +87,6 @@ public class Sprite {
 
     public void setHeight(int height) {
         this.height = height;
-    }
-
-    public int getInitialXPosition() {
-        return initialXPosition;
-    }
-
-    public void setInitialXPosition(int initialXPosition) {
-        this.initialXPosition = initialXPosition;
-    }
-
-    public int getInitialYPosition() {
-        return initialYPosition;
-    }
-
-    public void setInitialYPosition(int initialYPosition) {
-        this.initialYPosition = initialYPosition;
     }
 
     public void setInitialPosition(int initialX, int initialY) {

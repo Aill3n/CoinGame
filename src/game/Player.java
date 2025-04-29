@@ -2,12 +2,15 @@ package game;
 
 import java.awt.Color;
 
+/**
+ * The Player class represents the protagonist controlled by the user.
+ */
 public class Player extends Sprite {
 
     private static final int DIMENSION = 25;
     private static final Color COLOUR = Color.WHITE;
     private static int health = 3;
-    private boolean invencible = false;
+    private boolean invincible = false;
 
     public Player(int panelWidth, int panelHeight) {
         setWidth(DIMENSION);
@@ -25,12 +28,12 @@ public class Player extends Sprite {
         Player.health = health;
     }
 
-    public boolean isInvencible() {
-        return invencible;
+    public boolean isInvincible() {
+        return invincible;
     }
 
-    public void setInvencible(boolean invencible) {
-        this.invencible = invencible;
+    public void setInvincible(boolean invincible) {
+        this.invincible = invincible;
     }
 
 }
