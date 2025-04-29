@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 
-
 /**
  * Manages the game panel, display components, movements, and handles logic
  */
@@ -37,19 +36,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private final List<Coin> coins = new ArrayList<>();
     private int playerScore = 0;
 
-
-    // TODO: Coins shouldn't overlap.
-    // TODO: Enemies shouldn't overlap.
-    /*3. Objects collapsing;
-   - Os objetos so podem ser mensurados depois de criados
-   - Entao toda vez que criar, verifique senao existe um existente com posicao de range de 50 radius
-   - Se houver, delete o objeto e crie novamente*/
-
     Player player;
 
     /**
      * Constructor for the GamePanel.
-     * Sets up the game panel, initializes the game state, starts the game timer, and configures key listeners.
+     * Sets up the game panel, initializes the game state, starts the game timer,
+     * and configures key listeners.
      */
     public GamePanel() {
         setBackground(BACKGROUND_COLOR);
@@ -106,7 +98,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             checkObjectCollapsing(thisEnemy, enemies);
             enemies.add(thisEnemy);
         }
-}
+    }
 
     /**
      * Check the initial position of existing objects and avoids collapsing.
@@ -115,12 +107,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         for (Sprite obj : listItem) {
             while (isColliding(sprite, obj) || player.isPlayerTooClose(sprite)) {
 
-                int newX = WALL_WIDTH + PADDING + (int) (Math.random() * (getWidth() - 2 * (WALL_WIDTH + PADDING) - sprite.getWidth()));
-                int newY = WALL_HEIGHT + PADDING + (int) (Math.random() * (getHeight() - 2 * (WALL_HEIGHT + PADDING) - sprite.getHeight()));
+                int newX = WALL_WIDTH + PADDING
+                        + (int) (Math.random() * (getWidth() - 2 * (WALL_WIDTH + PADDING) - sprite.getWidth()));
+                int newY = WALL_HEIGHT + PADDING
+                        + (int) (Math.random() * (getHeight() - 2 * (WALL_HEIGHT + PADDING) - sprite.getHeight()));
 
                 sprite.setxPosition(newX);
                 sprite.setyPosition(newY);
-        }
+            }
         }
     }
 
@@ -220,15 +214,18 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         // Aligns the text slightly above the rectangle
         switch (gameState) {
             case INITIALISING ->
-                g.drawString("Press ENTER or SPACE to start the game.", borderPaddingWidth, borderPaddingHeight - PADDING);
+                g.drawString("Press ENTER or SPACE to start the game.", borderPaddingWidth,
+                        borderPaddingHeight - PADDING);
             case PLAYING -> {
                 g.drawString("Health:" + displayHearts(), borderPaddingWidth, borderPaddingHeight - PADDING);
                 g.drawString("\t Points:" + playerScore, borderPaddingWidth + 100, borderPaddingHeight - PADDING);
             }
             case GAME_OVER ->
-                g.drawString("Game Over! Press ENTER or SPACE to restart.", borderPaddingWidth, borderPaddingHeight - PADDING);
+                g.drawString("Game Over! Press ENTER or SPACE to restart.", borderPaddingWidth,
+                        borderPaddingHeight - PADDING);
             case GAME_WON ->
-                g.drawString("You won! Press ENTER or SPACE to play again.", borderPaddingWidth, borderPaddingHeight - PADDING);
+                g.drawString("You won! Press ENTER or SPACE to play again.", borderPaddingWidth,
+                        borderPaddingHeight - PADDING);
             default -> {
             }
         }
@@ -238,7 +235,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         int innerWidth = getWidth() - 2 * borderPaddingWidth;
         int innerHeight = getHeight() - 2 * borderPaddingHeight;
         g.drawRect(borderPaddingWidth, borderPaddingHeight, innerWidth, innerHeight);
-        g.fillRect(borderPaddingWidth, borderPaddingHeight, innerWidth,innerHeight);
+        g.fillRect(borderPaddingWidth, borderPaddingHeight, innerWidth, innerHeight);
 
         if (gameState == GameState.PLAYING) {
             paintSprite(g, player);
@@ -264,7 +261,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
 
     /**
-     * Handles a key typed event. This method is triggered when a key is typed (a key press followed by a key release),
+     * Handles a key typed event. This method is triggered when a key is typed (a
+     * key press followed by a key release),
      * and processes the input to determine the appropriate action for the game.
      *
      * @param event the KeyEvent object containing details about the key typed event
@@ -276,12 +274,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     /**
      * The behavior is as follows:
-     * - When the game is in the "PLAYING" state, arrow keys control the player's movement,
-     *   and the ESC key pauses the game (switches to "INITIALISING" state).
+     * - When the game is in the "PLAYING" state, arrow keys control the player's
+     * movement,
+     * and the ESC key pauses the game (switches to "INITIALISING" state).
      * - In the "INITIALISING," "GAME_OVER," or "GAME_WON" states:
-     *   - The ENTER or SPACE key restarts the game by recreating objects and switching the
-     *     state to "PLAYING."
-     *   - The ESC key exits the application.
+     * - The ENTER or SPACE key restarts the game by recreating objects and
+     * switching the
+     * state to "PLAYING."
+     * - The ESC key exits the application.
      *
      * @param event The KeyEvent representing the key press action, which is used to
      *              determine the action to take based on the current game state.
@@ -313,7 +313,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     /**
      * Handles the event triggered when a key is released.
      * If the game is in the PLAYING state, it stops the player's movement
-     * along the appropriate axis if the released key corresponds to a directional key.
+     * along the appropriate axis if the released key corresponds to a directional
+     * key.
      *
      * @param event the KeyEvent object that indicates which key was released
      */
@@ -328,9 +329,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
     }
 
-
     /**
-     * Updates the position of a sprite object based on its current x and y velocities
+     * Updates the position of a sprite object based on its current x and y
+     * velocities
      * and ensures the position remains within the panel's boundaries.
      *
      * @param obj the sprite whose position is being updated
@@ -358,7 +359,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             object.setyVelocity(-object.getyVelocity());
         }
     }
-    
+
     /**
      * Checks collisions between the player and game objects.
      * Coins increase the score and are removed, while enemy collisions
@@ -406,7 +407,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
 
     /**
-     * Determines whether two sprite objects are colliding or too close to one another
+     * Determines whether two sprite objects are colliding or too close to one
+     * another
      * by checking for overlapping positions and a proximity threshold.
      *
      * @param obj1 the first sprite object
@@ -421,7 +423,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 obj1.getyPosition() + obj1.getHeight() + distanceBetweenObj > obj2.getyPosition();
     }
 
-    
     /**
      * Displays the player's health using a string of hearts
      * based on their current health value.
@@ -453,7 +454,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     /**
      * Sets the initial velocity for a list of sprites.
-     * This method ensures all sprites (e.g., enemies) have uniform movement at the start.
+     * This method ensures all sprites (e.g., enemies) have uniform movement at the
+     * start.
      *
      * @param objects a list of sprites whose velocities are being initialized.
      */
